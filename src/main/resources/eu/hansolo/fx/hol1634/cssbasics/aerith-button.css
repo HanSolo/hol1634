@@ -1,0 +1,52 @@
+/*
+ * Copyright (c) 2016 by Gerrit Grunwald
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+.my-button {
+    -foreground-gradient-1: linear-gradient(to bottom, #707A8D 0%,
+                                                       #959FB2 100%);
+    -foreground-gradient-2: linear-gradient(to bottom, #484E59 0%,
+                                                       #20252E 100%);
+    -foreground-gradient-3: linear-gradient(to bottom, #AAB0BB 0%,
+                                                       #7F899A 5%,
+                                                       #60697A 50%,
+                                                       #5B6375 51%,
+                                                       #3E4658 95%,
+                                                       #333A48 100%);
+    -fx-pref-width       : 116px;
+    -fx-pref-height      : 35px;
+    -fx-background-insets: 0, 1, 2;
+    -fx-background-radius: 8, 7, 6;
+    -fx-background-color : -foreground-gradient-1,
+                           -foreground-gradient-2,
+                           -foreground-gradient-3;
+}
+.my-button:pressed {
+    -foreground-gradient-2: linear-gradient(to bottom, #484E59 0%,
+                                                       #A7AFBF 100%);
+    -foreground-gradient-3: linear-gradient(to bottom, #F7D381 0%,
+                                                       #F9C13E 5%,
+                                                       #FEA600 50%,
+                                                       #FEA200 51%,
+                                                       #FD8000 95%,
+                                                       #D56A00 100%);
+}
+.my-button .text {
+    -fx-font-family: "Roboto", "sans-serif";
+    -fx-font-weight: bold;
+    -fx-font-size  : 20px;
+    -fx-fill       : white;
+    -fx-effect     : dropshadow(two-pass-box, black, 1, 0, 1, 1);
+}

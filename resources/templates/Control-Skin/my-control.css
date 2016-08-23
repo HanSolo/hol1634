@@ -1,0 +1,7 @@
+.my-control {
+    -color: red;	
+}
+
+.my-control .node {
+	-fx-background-color: -color;
+}
