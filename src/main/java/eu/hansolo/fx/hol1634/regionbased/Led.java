@@ -44,17 +44,20 @@ public class Led extends Region {
         new StyleablePropertyFactory<>(Region.getClassCssMetaData());
 
     // CSS pseudo classes
-    private static final PseudoClass                    ON_PSEUDO_CLASS = PseudoClass.getPseudoClass("on");
+    private static final PseudoClass                    ON_PSEUDO_CLASS  = PseudoClass.getPseudoClass("on");
     private              BooleanProperty                on;
 
     // CSS Styleable property
-    private static final CssMetaData<Led, Color>        COLOR           = FACTORY.createColorCssMetaData("-color", s -> s.color, Color.RED, false);
+    private static final CssMetaData<Led, Color>        COLOR            = FACTORY.createColorCssMetaData("-color", s -> s.color, Color.RED, false);
     private        final StyleableProperty<Color>       color;
 
     // View related
-    private static final double                         PREFERRED_SIZE  = 16;
-    private static final double                         MINIMUM_SIZE    = 8;
-    private static final double                         MAXIMUM_SIZE    = 1024;
+    private static final double                         PREFERRED_WIDTH  = 16;
+    private static final double                         PREFERRED_HEIGHT = 16;
+    private static final double                         MINIMUM_WIDTH    = 8;
+    private static final double                         MINIMUM_HEIGHT   = 8;
+    private static final double                         MAXIMUM_WIDTH    = 1024;
+    private static final double                         MAXIMUM_HEIGHT   = 1024;
     private              double                         size;
     private              Region                         frame;
     private              Region                         main;
@@ -71,27 +74,19 @@ public class Led extends Region {
             @Override public String getName() { return "on"; }
         };
         color = new SimpleStyleableObjectProperty<>(COLOR, this, "color");
-        init();
         initGraphics();
         registerListeners();
     }
 
 
     // ******************** Initialization ************************************
-    private void init() {
+    private void initGraphics() {
+        // Set initial size
         if (Double.compare(getWidth(), 0) <= 0 || Double.compare(getHeight(), 0) <= 0 ||
             Double.compare(getPrefWidth(), 0) <= 0 || Double.compare(getPrefHeight(), 0) <= 0) {
-            setPrefSize(PREFERRED_SIZE, PREFERRED_SIZE);
+            setPrefSize(PREFERRED_WIDTH, PREFERRED_HEIGHT);
         }
-        if (Double.compare(getMinWidth(), 0) <= 0 || Double.compare(getMinHeight(), 0) <= 0) {
-            setMinSize(MINIMUM_SIZE, MINIMUM_SIZE);
-        }
-        if (Double.compare(getMaxWidth(), 0) <= 0 || Double.compare(getMaxHeight(), 0) <= 0) {
-            setMaxSize(MAXIMUM_SIZE, MAXIMUM_SIZE);
-        }
-    }
 
-    private void initGraphics() {
         // Apply the base CSS style class to the control
         getStyleClass().add("led");
 
@@ -128,6 +123,13 @@ public class Led extends Region {
     @Override public void layoutChildren() {
         super.layoutChildren();
     }
+
+    @Override protected double computeMinWidth(final double HEIGHT)  { return MINIMUM_WIDTH; }
+    @Override protected double computeMinHeight(final double WIDTH)  { return MINIMUM_HEIGHT; }
+    @Override protected double computePrefWidth(final double HEIGHT) { return super.computePrefWidth(HEIGHT); }
+    @Override protected double computePrefHeight(final double WIDTH) { return super.computePrefHeight(WIDTH); }
+    @Override protected double computeMaxWidth(final double HEIGHT)  { return MAXIMUM_WIDTH; }
+    @Override protected double computeMaxHeight(final double WIDTH)  { return MAXIMUM_HEIGHT; }
 
     protected void handleControlPropertyChanged(final String PROPERTY) {
         if ("RESIZE".equals(PROPERTY)) {

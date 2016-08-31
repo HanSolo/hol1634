@@ -51,14 +51,13 @@ public class ${name} extends Region {
         backgroundPaint = Color.TRANSPARENT;
         borderPaint     = Color.TRANSPARENT;
         borderWidth     = 0d;
-        init();
         initGraphics();
         registerListeners();
     }
 
 
     // ******************** Initialization ************************************
-    private void init() {
+    private void initGraphics() {
         if (Double.compare(getPrefWidth(), 0.0) <= 0 || Double.compare(getPrefHeight(), 0.0) <= 0 ||
             Double.compare(getWidth(), 0.0) <= 0 || Double.compare(getHeight(), 0.0) <= 0) {
             if (getPrefWidth() > 0 && getPrefHeight() > 0) {
@@ -68,16 +67,6 @@ public class ${name} extends Region {
             }
         }
 
-        if (Double.compare(getMinWidth(), 0.0) <= 0 || Double.compare(getMinHeight(), 0.0) <= 0) {
-            setMinSize(MINIMUM_WIDTH, MINIMUM_HEIGHT);
-        }
-
-        if (Double.compare(getMaxWidth(), 0.0) <= 0 || Double.compare(getMaxHeight(), 0.0) <= 0) {
-            setMaxSize(MAXIMUM_WIDTH, MAXIMUM_HEIGHT);
-        }        
-    }
-
-    private void initGraphics() {
         getStyleClass().add("my-region");
         
         pane = new Pane();                
@@ -99,7 +88,14 @@ public class ${name} extends Region {
     @Override public void layoutChildren() {
         super.layoutChildren();
     }
-    
+
+    @Override protected double computeMinWidth(final double HEIGHT)  { return MINIMUM_WIDTH; }
+    @Override protected double computeMinHeight(final double WIDTH)  { return MINIMUM_HEIGHT; }
+    @Override protected double computePrefWidth(final double HEIGHT) { return super.computePrefWidth(HEIGHT); }
+    @Override protected double computePrefHeight(final double WIDTH) { return super.computePrefHeight(WIDTH); }
+    @Override protected double computeMaxWidth(final double HEIGHT)  { return MAXIMUM_WIDTH; }
+    @Override protected double computeMaxHeight(final double WIDTH)  { return MAXIMUM_HEIGHT; }
+
     private void handleControlPropertyChanged(final String PROPERTY) {
         if ("".equals(PROPERTY)) {
         

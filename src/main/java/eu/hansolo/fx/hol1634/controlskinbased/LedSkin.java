@@ -29,9 +29,12 @@ import javafx.scene.paint.Color;
  * Created by hansolo on 12.08.16.
  */
 public class LedSkin extends SkinBase<CustomControl> implements Skin<CustomControl> {
-    private static final double      PREFERRED_SIZE = 16;
-    private static final double      MINIMUM_SIZE   = 8;
-    private static final double      MAXIMUM_SIZE   = 1024;
+    private static final double      PREFERRED_WIDTH  = 16;
+    private static final double      PREFERRED_HEIGHT = 16;
+    private static final double      MINIMUM_WIDTH    = 8;
+    private static final double      MINIMUM_HEIGHT   = 8;
+    private static final double      MAXIMUM_WIDTH    = 1024;
+    private static final double      MAXIMUM_HEIGHT   = 1024;
     private              double      size;
     private              Region      frame;
     private              Region      main;
@@ -43,31 +46,22 @@ public class LedSkin extends SkinBase<CustomControl> implements Skin<CustomContr
     // ******************** Constructors **************************************
     public LedSkin(final CustomControl CONTROL) {
         super(CONTROL);
-        init();
         initGraphics();
         registerListeners();
     }
 
 
     // ******************** Initialization ************************************
-    private void init() {
+    private void initGraphics() {
         if (Double.compare(getSkinnable().getPrefWidth(), 0.0) <= 0 || Double.compare(getSkinnable().getPrefHeight(), 0.0) <= 0 ||
             Double.compare(getSkinnable().getWidth(), 0.0) <= 0 || Double.compare(getSkinnable().getHeight(), 0.0) <= 0) {
             if (getSkinnable().getPrefWidth() > 0 && getSkinnable().getPrefHeight() > 0) {
                 getSkinnable().setPrefSize(getSkinnable().getPrefWidth(), getSkinnable().getPrefHeight());
             } else {
-                getSkinnable().setPrefSize(PREFERRED_SIZE, PREFERRED_SIZE);
+                getSkinnable().setPrefSize(PREFERRED_WIDTH, PREFERRED_HEIGHT);
             }
         }
-        if (Double.compare(getSkinnable().getMinWidth(), 0.0) <= 0 || Double.compare(getSkinnable().getMinHeight(), 0.0) <= 0) {
-            getSkinnable().setMinSize(MINIMUM_SIZE, MINIMUM_SIZE);
-        }
-        if (Double.compare(getSkinnable().getMaxWidth(), 0.0) <= 0 || Double.compare(getSkinnable().getMaxHeight(), 0.0) <= 0) {
-            getSkinnable().setMaxSize(MAXIMUM_SIZE, MAXIMUM_SIZE);
-        }
-    }
 
-    private void initGraphics() {
         frame = new Region();
         frame.getStyleClass().setAll("frame");
 
@@ -98,6 +92,13 @@ public class LedSkin extends SkinBase<CustomControl> implements Skin<CustomContr
     @Override public void layoutChildren(final double X, final double Y, final double WIDTH, final double HEIGHT) {
         super.layoutChildren(X, Y, WIDTH, HEIGHT);
     }
+
+    @Override protected double computeMinWidth(final double HEIGHT, final double TOP, final double RIGHT, final double BOTTOM, final double LEFT)  { return MINIMUM_WIDTH; }
+    @Override protected double computeMinHeight(final double WIDTH, final double TOP, final double RIGHT, final double BOTTOM, final double LEFT)  { return MINIMUM_HEIGHT; }
+    @Override protected double computePrefWidth(final double HEIGHT, final double TOP, final double RIGHT, final double BOTTOM, final double LEFT) { return super.computePrefWidth(HEIGHT, TOP, RIGHT, BOTTOM, LEFT); }
+    @Override protected double computePrefHeight(final double WIDTH, final double TOP, final double RIGHT, final double BOTTOM, final double LEFT) { return super.computePrefHeight(WIDTH, TOP, RIGHT, BOTTOM, LEFT); }
+    @Override protected double computeMaxWidth(final double HEIGHT, final double TOP, final double RIGHT, final double BOTTOM, final double LEFT)  { return MAXIMUM_WIDTH; }
+    @Override protected double computeMaxHeight(final double WIDTH, final double TOP, final double RIGHT, final double BOTTOM, final double LEFT)  { return MAXIMUM_HEIGHT; }
 
     protected void handleControlPropertyChanged(final String PROPERTY) {
         if ("RESIZE".equals(PROPERTY)) {

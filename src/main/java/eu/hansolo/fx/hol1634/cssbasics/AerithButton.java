@@ -39,20 +39,17 @@ public class AerithButton extends Region {
     public AerithButton(final String TEXT) {
         getStylesheets().add(AerithButton.class.getResource("aerith-button.css").toExternalForm());
         text = new Text(TEXT);
-        init();
         initGraphics();
         registerListeners();
     }
 
 
     // ******************** Initialization ************************************
-    private void init() {
+    private void initGraphics() {
         setPrefSize(WIDTH, HEIGHT);
         setMinSize(WIDTH, HEIGHT);
         setMaxSize(WIDTH, HEIGHT);
-    }
 
-    private void initGraphics() {
         getStyleClass().add("my-button");
 
         text.setTextOrigin(VPos.CENTER);
