@@ -16,3 +16,17 @@ jar {
 dependencies {
 
 }
+
+["combining.DemoCombined",
+"controlskinbased.DemoControlSkinBased",
+"cssbasics.DemoCssBasics",
+"extending.DemoExtended",
+"regionbased.DemoRegionBased",
+"restyling.DemoRestyled"].each{String demoClassName ->
+  def taskName = demoClassName.tokenize(".")[1]
+  tasks.create(type:JavaExec, name:taskName,dependsOn: build,group:"Demo Applications"){
+    classpath = sourceSets.main.runtimeClasspath
+    main = "eu.hansolo.fx.hol1634.${demoClassName}"
+  }
+
+}
