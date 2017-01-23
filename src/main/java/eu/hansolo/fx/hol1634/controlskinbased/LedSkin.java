@@ -16,6 +16,7 @@
 
 package eu.hansolo.fx.hol1634.controlskinbased;
 
+import javafx.beans.InvalidationListener;
 import javafx.scene.control.Skin;
 import javafx.scene.control.SkinBase;
 import javafx.scene.effect.BlurType;
@@ -29,23 +30,31 @@ import javafx.scene.paint.Color;
  * Created by hansolo on 12.08.16.
  */
 public class LedSkin extends SkinBase<CustomControl> implements Skin<CustomControl> {
-    private static final double      PREFERRED_WIDTH  = 16;
-    private static final double      PREFERRED_HEIGHT = 16;
-    private static final double      MINIMUM_WIDTH    = 8;
-    private static final double      MINIMUM_HEIGHT   = 8;
-    private static final double      MAXIMUM_WIDTH    = 1024;
-    private static final double      MAXIMUM_HEIGHT   = 1024;
-    private              double      size;
-    private              Region      frame;
-    private              Region      main;
-    private              Region      highlight;
-    private              InnerShadow innerShadow;
-    private              DropShadow  glow;
+    private static final double               PREFERRED_WIDTH  = 16;
+    private static final double               PREFERRED_HEIGHT = 16;
+    private static final double               MINIMUM_WIDTH    = 8;
+    private static final double               MINIMUM_HEIGHT   = 8;
+    private static final double               MAXIMUM_WIDTH    = 1024;
+    private static final double               MAXIMUM_HEIGHT   = 1024;
+    private              double               size;
+    private              Region               frame;
+    private              Region               main;
+    private              Region               highlight;
+    private              InnerShadow          innerShadow;
+    private              DropShadow           glow;
+    private              CustomControl        control;
+    private              InvalidationListener sizeListener;
+    private              InvalidationListener colorListener;
+    private              InvalidationListener onListener;
 
 
     // ******************** Constructors **************************************
     public LedSkin(final CustomControl CONTROL) {
         super(CONTROL);
+        control       = CONTROL;
+        sizeListener  = o -> handleControlPropertyChanged("RESIZE");
+        colorListener = o -> handleControlPropertyChanged("COLOR");
+        onListener    = o -> handleControlPropertyChanged("ON");
         initGraphics();
         registerListeners();
     }
@@ -53,12 +62,12 @@ public class LedSkin extends SkinBase<CustomControl> implements Skin<CustomContr
 
     // ******************** Initialization ************************************
     private void initGraphics() {
-        if (Double.compare(getSkinnable().getPrefWidth(), 0.0) <= 0 || Double.compare(getSkinnable().getPrefHeight(), 0.0) <= 0 ||
-            Double.compare(getSkinnable().getWidth(), 0.0) <= 0 || Double.compare(getSkinnable().getHeight(), 0.0) <= 0) {
-            if (getSkinnable().getPrefWidth() > 0 && getSkinnable().getPrefHeight() > 0) {
-                getSkinnable().setPrefSize(getSkinnable().getPrefWidth(), getSkinnable().getPrefHeight());
+        if (Double.compare(control.getPrefWidth(), 0.0) <= 0 || Double.compare(control.getPrefHeight(), 0.0) <= 0 ||
+            Double.compare(control.getWidth(), 0.0) <= 0 || Double.compare(control.getHeight(), 0.0) <= 0) {
+            if (control.getPrefWidth() > 0 && control.getPrefHeight() > 0) {
+                control.setPrefSize(control.getPrefWidth(), control.getPrefHeight());
             } else {
-                getSkinnable().setPrefSize(PREFERRED_WIDTH, PREFERRED_HEIGHT);
+                control.setPrefSize(PREFERRED_WIDTH, PREFERRED_HEIGHT);
             }
         }
 
@@ -67,11 +76,11 @@ public class LedSkin extends SkinBase<CustomControl> implements Skin<CustomContr
 
         main = new Region();
         main.getStyleClass().setAll("main");
-        main.setStyle(String.join("", "-color: ", getSkinnable().getColor().toString().replace("0x", "#"), ";"));
+        main.setStyle(String.join("", "-color: ", control.getColor().toString().replace("0x", "#"), ";"));
 
         innerShadow = new InnerShadow(BlurType.TWO_PASS_BOX, Color.rgb(0, 0, 0, 0.65), 8, 0, 0, 0);
 
-        glow = new DropShadow(BlurType.TWO_PASS_BOX, getSkinnable().getColor(), 20, 0, 0, 0);
+        glow = new DropShadow(BlurType.TWO_PASS_BOX, control.getColor(), 20, 0, 0, 0);
         glow.setInput(innerShadow);
 
         highlight = new Region();
@@ -81,10 +90,10 @@ public class LedSkin extends SkinBase<CustomControl> implements Skin<CustomContr
     }
 
     private void registerListeners() {
-        getSkinnable().widthProperty().addListener(o -> handleControlPropertyChanged("RESIZE") );
-        getSkinnable().heightProperty().addListener(o -> handleControlPropertyChanged("RESIZE") );
-        getSkinnable().colorProperty().addListener(o -> handleControlPropertyChanged("COLOR"));
-        getSkinnable().onProperty().addListener(o -> handleControlPropertyChanged("ON") );
+        control.widthProperty().addListener(sizeListener);
+        control.heightProperty().addListener(sizeListener);
+        control.colorProperty().addListener(colorListener);
+        control.onProperty().addListener(onListener);
     }
 
 
@@ -104,30 +113,38 @@ public class LedSkin extends SkinBase<CustomControl> implements Skin<CustomContr
         if ("RESIZE".equals(PROPERTY)) {
             resize();
         } else if ("COLOR".equals(PROPERTY)) {
-            main.setStyle(String.join("", "-color: ", (getSkinnable().getColor()).toString().replace("0x", "#"), ";"));
+            main.setStyle(String.join("", "-color: ", (control.getColor()).toString().replace("0x", "#"), ";"));
             resize();
         } else if ("ON".equals(PROPERTY)) {
-            main.setEffect(getSkinnable().isOn() ? glow : innerShadow);
+            main.setEffect(control.isOn() ? glow : innerShadow);
         }
+    }
+
+    @Override public void dispose() {
+        control.widthProperty().removeListener(sizeListener);
+        control.heightProperty().removeListener(sizeListener);
+        control.colorProperty().removeListener(colorListener);
+        control.onProperty().removeListener(onListener);
+        control = null;
     }
 
 
     // ******************** Resizing ******************************************
     private void resize() {
-        double width  = getSkinnable().getWidth() - getSkinnable().getInsets().getLeft() - getSkinnable().getInsets().getRight();
-        double height = getSkinnable().getHeight() - getSkinnable().getInsets().getTop() - getSkinnable().getInsets().getBottom();
+        double width  = control.getWidth() - control.getInsets().getLeft() - control.getInsets().getRight();
+        double height = control.getHeight() - control.getInsets().getTop() - control.getInsets().getBottom();
         size          = width < height ? width : height;
 
         if (size > 0) {
             innerShadow.setRadius(0.07 * size);
             glow.setRadius(0.36 * size);
-            glow.setColor(getSkinnable().getColor());
+            glow.setColor(control.getColor());
 
             frame.setMaxSize(size, size);
 
             main.setMaxSize(0.72 * size, 0.72 * size);
             main.relocate(0.14 * size, 0.14 * size);
-            main.setEffect(getSkinnable().isOn() ? glow : innerShadow);
+            main.setEffect(control.isOn() ? glow : innerShadow);
 
             highlight.setMaxSize(0.58 * size, 0.58 * size);
             highlight.relocate(0.21 * size, 0.21 * size);

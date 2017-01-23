@@ -17,8 +17,11 @@
 package eu.hansolo.fx.hol1634.controlskinbased;
 
 import javafx.animation.TranslateTransition;
+import javafx.beans.InvalidationListener;
+import javafx.event.EventHandler;
 import javafx.scene.control.Skin;
 import javafx.scene.control.SkinBase;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.Region;
 import javafx.util.Duration;
@@ -28,17 +31,25 @@ import javafx.util.Duration;
  * Created by hansolo on 12.08.16.
  */
 public class SwitchSkin extends SkinBase<CustomControl> implements Skin<CustomControl> {
-    private static final double              PREFERRED_WIDTH  = 76;
-    private static final double              PREFERRED_HEIGHT = 46;
-    private              Region              switchBackground;
-    private              Region              thumb;
-    private              Pane                pane;
-    private              TranslateTransition translate;
+    private static final double                   PREFERRED_WIDTH  = 76;
+    private static final double                   PREFERRED_HEIGHT = 46;
+    private              Region                   switchBackground;
+    private              Region                   thumb;
+    private              Pane                     pane;
+    private              TranslateTransition      translate;
+    private              CustomControl            control;
+    private              InvalidationListener     colorListener;
+    private              InvalidationListener     onListener;
+    private              EventHandler<MouseEvent> mouseEventHandler;
 
 
     // ******************** Constructors **************************************
     public SwitchSkin(final CustomControl CONTROL) {
         super(CONTROL);
+        control           = CONTROL;
+        colorListener     = o -> handleControlPropertyChanged("COLOR");
+        onListener        = o -> handleControlPropertyChanged("ON");
+        mouseEventHandler = e -> control.setOn(!control.isOn());
         initGraphics();
         registerListeners();
     }
@@ -48,11 +59,11 @@ public class SwitchSkin extends SkinBase<CustomControl> implements Skin<CustomCo
     private void initGraphics() {
         switchBackground = new Region();
         switchBackground.getStyleClass().add("switch-background");
-        switchBackground.setStyle(String.join("", "-color: ", getSkinnable().getColor().toString().replace("0x", "#"), ";"));
+        switchBackground.setStyle(String.join("", "-color: ", control.getColor().toString().replace("0x", "#"), ";"));
 
         thumb = new Region();
         thumb.getStyleClass().add("thumb");
-        if (getSkinnable().isOn()) { thumb.setTranslateX(32); }
+        if (control.isOn()) { thumb.setTranslateX(32); }
 
         translate = new TranslateTransition(Duration.millis(70), thumb);
 
@@ -61,9 +72,9 @@ public class SwitchSkin extends SkinBase<CustomControl> implements Skin<CustomCo
     }
 
     private void registerListeners() {
-        getSkinnable().colorProperty().addListener(o -> handleControlPropertyChanged("COLOR"));
-        getSkinnable().onProperty().addListener(o -> handleControlPropertyChanged("ON") );
-        thumb.setOnMousePressed(e -> getSkinnable().setOn(!getSkinnable().isOn()));
+        control.colorProperty().addListener(colorListener);
+        control.onProperty().addListener(onListener);
+        thumb.setOnMousePressed(mouseEventHandler);
     }
 
 
@@ -76,9 +87,9 @@ public class SwitchSkin extends SkinBase<CustomControl> implements Skin<CustomCo
 
     protected void handleControlPropertyChanged(final String PROPERTY) {
         if ("COLOR".equals(PROPERTY)) {
-            switchBackground.setStyle(String.join("", "-color: ", getSkinnable().getColor().toString().replace("0x", "#"), ";"));
+            switchBackground.setStyle(String.join("", "-color: ", control.getColor().toString().replace("0x", "#"), ";"));
         } else if ("ON".equals(PROPERTY)) {
-            if (getSkinnable().isOn()) {
+            if (control.isOn()) {
                 // move thumb to the right
                 translate.setFromX(2);
                 translate.setToX(32);
@@ -89,5 +100,11 @@ public class SwitchSkin extends SkinBase<CustomControl> implements Skin<CustomCo
             }
             translate.play();
         }
+    }
+
+    @Override public void dispose() {
+        control.colorProperty().removeListener(colorListener);
+        control.onProperty().removeListener(onListener);
+        control.removeEventHandler(MouseEvent.MOUSE_PRESSED, mouseEventHandler);
     }
 }
