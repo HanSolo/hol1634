@@ -54,7 +54,7 @@ public class SearchTextFieldSkin extends TextFieldSkin {
 
     private void registerListeners() {
         getSkinnable().heightProperty().addListener(sizeListener);
-        getSkinnable().focusedProperty().addListener(sizeListener);
+        getSkinnable().focusedProperty().addListener(focusListener);
     }
 
 
@@ -75,7 +75,7 @@ public class SearchTextFieldSkin extends TextFieldSkin {
 
     @Override public void dispose() {
         getSkinnable().heightProperty().removeListener(sizeListener);
-        getSkinnable().focusedProperty().removeListener(sizeListener);
+        getSkinnable().focusedProperty().removeListener(focusListener);
         super.dispose();
     }
 }
