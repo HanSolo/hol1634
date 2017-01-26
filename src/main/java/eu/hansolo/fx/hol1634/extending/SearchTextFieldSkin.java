@@ -17,6 +17,7 @@
 package eu.hansolo.fx.hol1634.extending;
 
 import com.sun.javafx.scene.control.skin.TextFieldSkin;
+import javafx.beans.InvalidationListener;
 import javafx.scene.layout.Region;
 
 
@@ -24,13 +25,18 @@ import javafx.scene.layout.Region;
  * Created by hansolo on 19.08.16.
  */
 public class SearchTextFieldSkin extends TextFieldSkin {
-    private Region loupe;
-    private double size;
+    private Region               loupe;
+    private double               size;
+    private InvalidationListener sizeListener;
+    private InvalidationListener focusListener;
 
 
     // ******************** Constructors **************************************
     public SearchTextFieldSkin(final SearchTextField CONTROL){
         super(CONTROL);
+
+        sizeListener  = o -> handleControlPropertyChanged("RESIZE");
+        focusListener = o -> handleControlPropertyChanged("FOCUSED");
 
         initGraphics();
         registerListeners();
@@ -47,8 +53,8 @@ public class SearchTextFieldSkin extends TextFieldSkin {
     }
 
     private void registerListeners() {
-        getSkinnable().heightProperty().addListener(o -> handleControlPropertyChanged("RESIZE"));
-        getSkinnable().focusedProperty().addListener(o -> handleControlPropertyChanged("FOCUSED"));
+        getSkinnable().heightProperty().addListener(sizeListener);
+        getSkinnable().focusedProperty().addListener(sizeListener);
     }
 
 
@@ -65,5 +71,11 @@ public class SearchTextFieldSkin extends TextFieldSkin {
         } else if ("FOCUSED".equals(PROPERTY)) {
             loupe.setVisible(!getSkinnable().isFocused() && getSkinnable().getText().isEmpty());
         }
+    }
+
+    @Override public void dispose() {
+        getSkinnable().heightProperty().removeListener(sizeListener);
+        getSkinnable().focusedProperty().removeListener(sizeListener);
+        super.dispose();
     }
 }
